@@ -26,7 +26,7 @@ def main(args):
         if args.recognized_dir:
             print(f'Recognizing file {filename}')
             rect = image.recognize(img)
-            image.util.draw_rectangle(src_img, rect, stroke=2, color=(255, 0, 0))
+            image.util.draw_rectangle(src_img, rect, stroke=2, color=(0, 255, 0))
             src_img.save(
                 change_filename_dir(filename, args.recognized_dir)
             )
