@@ -12,6 +12,8 @@ if sys.version_info < (3, 0):
     sys.stdout.write("Requires Python 3.x, not Python 2.x\n")
     sys.exit(1)
 
+__version__ = '1.0.0'
+
 
 def main(args):
     filenames = get_filenames_from_dir(args.input_dir)
@@ -19,13 +21,18 @@ def main(args):
         print(f'Transforming file {filename}')
         src_img = Image.open(filename)
         img = image.transform_image(src_img, args.transform_k)
-        if args.transformed_dir:
+        if args.transformed_dir and not args.recognized_dir:
             img.save(
                 change_filename_dir(filename, args.transformed_dir)
             )
         if args.recognized_dir:
             print(f'Recognizing file {filename}')
-            rect = image.recognize(img, rect_size=16, step_percent=0.4)
+            rect = image.recognize(img, rect_size=12, step_percent=0.5)
+            if args.transformed_dir:
+                image.util.draw_rectangle(img, rect, stroke=2, color=(0, 255, 0))
+                img.save(
+                    change_filename_dir(filename, args.transformed_dir)
+                )
             image.util.draw_rectangle(src_img, rect, stroke=2, color=(0, 255, 0))
             src_img.save(
                 change_filename_dir(filename, args.recognized_dir)
@@ -34,7 +41,7 @@ def main(args):
 
 def get_args():
     parser = argparse.ArgumentParser(
-        description='Utility for finding blood cells in image.'
+        description='Utility for finding blood cells in image. '
                     'Specify at least one of output directories.'
     )
     parser.add_argument(
@@ -90,6 +97,12 @@ def get_args():
         required=True,
         help='The k parameter for transformation. In range [%r, %r]' % image.transform_k_range,
         dest='transform_k'
+    )
+    parser.add_argument(
+        '--version', '-v',
+        action='version',
+        version=f'v{__version__}',
+        help='Print version of the package',
     )
     args = parser.parse_args()
 

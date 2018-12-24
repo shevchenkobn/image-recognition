@@ -1,7 +1,7 @@
 
 transform_k_range = (0.8, 1.2)
-MARKED = (255, 255, 255)
-NON_MARKED = (0, 0, 0)
+MARKED = (0, 0, 0)
+NON_MARKED = (255, 255, 255)
 
 
 def _average_pixel(pixel):
@@ -32,7 +32,7 @@ def transform_image(image, k):
 
 
 def _get_largest_cluster_bounds(clusters, row_height):
-    for i in range(len(clusters) - 1):
+    for i in range(len(clusters)):
         rect_count, bounds = clusters[i]
         if not rect_count:
             continue
@@ -77,8 +77,8 @@ def recognize(image, rect_size, step_percent=0.5):
                     if pixels[(x, y)] == MARKED:
                         count += 1
             if count < step_count:
-                if rect_count > 1:
-                    clusters.append([rect_count, (lower_left, upper_right)])
+                # if rect_count > 1:
+                clusters.append([rect_count, (lower_left, upper_right)])
                 lower_left = col * rect_size, row * rect_size
                 upper_right = lower_left[0] + rect_size, lower_left[1] * rect_size
                 rect_count = 1
@@ -93,8 +93,8 @@ def recognize(image, rect_size, step_percent=0.5):
                     if pixels[(x, y)] == MARKED:
                         count += 1
             if count < row_end_step_count:
-                if rect_count > 1:
-                    clusters.append([rect_count, (lower_left, upper_right)])
+                # if rect_count > 1:
+                clusters.append([rect_count, (lower_left, upper_right)])
                 lower_left = col_limit * rect_size, row * rect_size
                 upper_right = size[0], lower_left[1] + rect_size
                 rect_count = 1
@@ -112,8 +112,8 @@ def recognize(image, rect_size, step_percent=0.5):
                     if pixels[(x, y)] == MARKED:
                         count += 1
             if count < last_row_step_count:
-                if rect_count > 1:
-                    clusters.append([rect_count, (lower_left, upper_right)])
+                # if rect_count > 1:
+                clusters.append([rect_count, (lower_left, upper_right)])
                 lower_left = col * rect_size, row_limit * rect_size
                 upper_right = lower_left[0] + rect_size, size[1]
                 rect_count = 1
@@ -129,16 +129,16 @@ def recognize(image, rect_size, step_percent=0.5):
                     if pixels[(x, y)] == MARKED:
                         count += 1
             if count < last_row_end_step_count:
-                if rect_count > 1:
-                    clusters.append([rect_count, (lower_left, upper_right)])
+                # if rect_count > 1:
+                clusters.append([rect_count, (lower_left, upper_right)])
                 lower_left = col_limit * rect_size, row_limit * rect_size
                 upper_right = size
                 rect_count = 1
             else:
                 upper_right = size
                 rect_count += 1
-        if rect_count > 1:
-            clusters.append([rect_count, (lower_left, upper_right)])
+        # if rect_count > 1:
+        clusters.append([rect_count, (lower_left, upper_right)])
 
     if not clusters:
         return lower_left, upper_right
