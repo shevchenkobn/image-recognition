@@ -54,6 +54,19 @@ def _get_largest_cluster_bounds(clusters, row_height):
     return max(clusters, key=lambda cluster: cluster[0])[1]
 
 
+def _extend(bounds, margin, width, height):
+    lower_left, upper_right = list(bounds[0]), list(bounds[1])
+    if lower_left[1] > margin:
+        lower_left[1] -= margin
+    if upper_right[0] + margin < width:
+        upper_right[0] += margin
+    if upper_right[1] + 2 * margin < height:
+        upper_right[1] += 2 * margin
+
+    return tuple(lower_left), tuple(upper_right)
+
+
+
 def recognize(image, rect_size, step_percent=0.5):
     size = image.size
     pixels = image.load()
@@ -142,4 +155,5 @@ def recognize(image, rect_size, step_percent=0.5):
 
     if not clusters:
         return lower_left, upper_right
-    return _get_largest_cluster_bounds(clusters, rect_size)
+
+    return _extend(_get_largest_cluster_bounds(clusters, rect_size), rect_size, *size)
