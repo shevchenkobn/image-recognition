@@ -27,7 +27,7 @@ def main(args):
             )
         if args.recognized_dir:
             print(f'Recognizing file {filename}')
-            rect = image.recognize(img, rect_size=12, step_percent=0.5)
+            rect = image.recognize(img, rect_size=12, step_percent=0.35)
             if args.transformed_dir:
                 image.util.draw_rectangle(img, rect, stroke=2, color=(0, 255, 0))
                 img.save(
