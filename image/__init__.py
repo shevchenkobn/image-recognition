@@ -1,5 +1,5 @@
 
-transform_k_range = (0.8, 1.2)
+TRANSFORM_K_RANGE = (0.8, 1.2)
 MARKED = (0, 0, 0)
 NON_MARKED = (255, 255, 255)
 
@@ -15,11 +15,9 @@ def transform_image(image, k):
 
     pixel_sum = 0
     for y in range(size[1]):
-        average_pixels = tuple(
-            map(lambda x: _average_pixel(pixels[(x, y)]), range(size[0]))
-        )
+        average_pixels = tuple(_average_pixel(pixels[(new_x, y)]) for new_x in range(size[0]))
         max_average_pixel = max(average_pixels)
-        for x in range(size[0]):
+        for x in range(len(average_pixels)):
             pixel = average_pixels[x]
             pixel_sum += pixel
             if pixel_sum >= k * max_average_pixel:
@@ -66,7 +64,6 @@ def _extend(bounds, margin, width, height):
     return tuple(lower_left), tuple(upper_right)
 
 
-
 def recognize(image, rect_size, step_percent=0.5):
     size = image.size
     pixels = image.load()
@@ -98,7 +95,7 @@ def recognize(image, rect_size, step_percent=0.5):
             else:
                 upper_right = (col + 1) * rect_size, (row + 1) * rect_size
                 rect_count += 1
-        # process the end of the rows if width is not a multiple of the rect size (code duplication is intentional)
+        # process the end of the rows if width is not a multiple of the rect size
         if row_end_len:
             count = 0
             for y in range(row * rect_size, (row + 1) * rect_size):
@@ -114,7 +111,7 @@ def recognize(image, rect_size, step_percent=0.5):
             else:
                 upper_right = size[0], (row + 1) * rect_size
                 rect_count += 1
-    # process the last row if height is not a multiple of the rect size (code duplication is intentional)
+    # process the last row if height is not a multiple of the rect size
     last_row_height = size[1] - row_limit * rect_size
     if last_row_height:
         last_row_step_count = last_row_height * rect_size * step_percent
@@ -133,7 +130,7 @@ def recognize(image, rect_size, step_percent=0.5):
             else:
                 upper_right = (col + 1) * rect_size, size[1]
                 rect_count += 1
-        # process the end of the last row if width is not a multiple of the rect size (code duplication is intentional)
+        # process the end of the last row if width is not a multiple of the rect size
         if row_end_len:
             last_row_end_step_count = last_row_height * row_end_len * step_percent
             count = 0

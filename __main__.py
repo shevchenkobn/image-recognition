@@ -25,13 +25,13 @@ def main(args):
         print(f'Transforming file {filename}')
         src_img = Image.open(filename)
         img = image.transform_image(src_img, args.transform_k)
-        if args.transformed_dir:
+        if args.transformed_dir and not args.recognized_dir:
             img.save(
                 change_filename_dir(filename, args.transformed_dir)
             )
         if args.recognized_dir:
             print(f'Recognizing file {filename}')
-            rect = image.recognize(img, rect_size=12, step_percent=0.5)
+            rect = image.recognize(img, rect_size=12, step_percent=0.475)
             if args.transformed_dir:
                 image.util.draw_rectangle(img, rect, stroke=2, color=(0, 255, 0))
                 img.save(
@@ -94,9 +94,9 @@ def get_args():
         '--transform-k', '-k',
         action='store',
         nargs='?',
-        type=RangedFloatType(image.transform_k_range),
+        type=RangedFloatType(image.TRANSFORM_K_RANGE),
         required=True,
-        help='The k parameter for transformation. In range [%r, %r]' % image.transform_k_range,
+        help='The k parameter for transformation. In range [%r, %r]' % image.TRANSFORM_K_RANGE,
         dest='transform_k'
     )
     parser.add_argument(
