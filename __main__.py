@@ -3,13 +3,13 @@ import os
 import sys
 from PIL import Image
 
-from util import change_filename_dir
+from util import change_filename_dir, ensure_dir
 from image.util import get_filenames_from_dir
 from util.argparse import PathType, RangedFloatType
 import image
 
-if sys.version_info < (3, 0):
-    sys.stdout.write("Requires Python 3.x, not Python 2.x\n")
+if sys.version_info < (3, 6):
+    sys.stdout.write("Requires Python 3.6 at minimum (pillow constraint, tested on 3.8)\n")
     sys.exit(1)
 
 __version__ = '1.0.0'
@@ -17,11 +17,15 @@ __version__ = '1.0.0'
 
 def main(args):
     filenames = get_filenames_from_dir(args.input_dir)
+    if args.transformed_dir:
+        ensure_dir(args.transformed_dir)
+    if args.recognized_dir:
+        ensure_dir(args.recognized_dir)
     for filename in filenames:
         print(f'Transforming file {filename}')
         src_img = Image.open(filename)
         img = image.transform_image(src_img, args.transform_k)
-        if args.transformed_dir and not args.recognized_dir:
+        if args.transformed_dir:
             img.save(
                 change_filename_dir(filename, args.transformed_dir)
             )
@@ -37,6 +41,7 @@ def main(args):
             src_img.save(
                 change_filename_dir(filename, args.recognized_dir)
             )
+    print('Finished ' + ('recognition' if args.recognized_dir else 'transformation'))
 
 
 def get_args():
@@ -64,14 +69,12 @@ def get_args():
         action='store',
         nargs='?',
         type=PathType(
-            exists=True,
             arg_type='dir',
             dash_ok=False,
             permission=os.W_OK
         ),
         required=False,
-        help='The output directory to write black-white files to.\n'
-             'WARNING! IT MUST BE EXISTENT!',
+        help='The output directory to write black-white files to.',
         dest='transformed_dir'
     )
     parser.add_argument(
@@ -79,14 +82,12 @@ def get_args():
         action='store',
         nargs='?',
         type=PathType(
-            exists=True,
             arg_type='dir',
             dash_ok=False,
             permission=os.W_OK
         ),
         required=False,
-        help='The output directory to write recognized files to.\n'
-             'WARNING! IT MUST BE EXISTENT!',
+        help='The output directory to write recognized files to.',
         dest='recognized_dir'
     )
     parser.add_argument(
